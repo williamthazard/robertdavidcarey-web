@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
-from .models import Page, LogEntry, LogAsset, PageAsset
+from .models import Page, LogEntry, LogAsset, PageAsset, Subscriber
 
 class PageAssetInline(admin.TabularInline):
     model = PageAsset
@@ -35,10 +35,21 @@ class LogAssetInline(admin.TabularInline):
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
-    list_display = ('title', 'publish_date')
+    list_display = ('title', 'publish_date', 'send_email_notification', 'email_sent')
     search_fields = ('title', 'content_markdown')
     prepopulated_fields = {'slug': ('title',)}
     inlines = [LogAssetInline]
+    
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'slug', 'content_markdown', 'publish_date')
+        }),
+        ('Newsletter Options', {
+            'fields': ('send_email_notification', 'email_sent'),
+            'description': 'Configure automatic email dispatch to subscriber list.'
+        }),
+    )
+    readonly_fields = ('email_sent',)
 
 @admin.register(Page)
 class PageAdmin(admin.ModelAdmin):
@@ -57,3 +68,9 @@ class LogAssetAdmin(admin.ModelAdmin):
     list_display = ('id', 'log_entry', 'file', 'custom_filename')
     list_filter = ('log_entry',)
     search_fields = ('custom_filename', 'file')
+
+@admin.register(Subscriber)
+class SubscriberAdmin(admin.ModelAdmin):
+    list_display = ('email', 'subscribed_at')
+    search_fields = ('email',)
+

@@ -30,4 +30,25 @@
     <a href="{% url 'log_index' %}">[final]</a>
     <a href="?page={{ page_obj.paginator.num_pages }}">[first]</a>
   </p>
+
+  <hr style="margin-top: 3em; border: 0; border-top: 1px dashed #666;"/>
+  
+  <div style="margin: 2em 0; text-align: center;">
+    <h3>subscribe to the newsletter</h3>
+    <p style="font-size: 0.9em; color: #aaa;">Get new log entries delivered directly to your inbox.</p>
+    
+    {% if messages %}
+      {% for message in messages %}
+        <div style="padding: 10px; margin: 10px auto; max-width: 400px; background: {% if message.tags == 'success' %}#2e4d2e{% elif message.tags == 'info' %}#3a3a3a{% else %}#5d2e2e{% endif %}; color: #fff; font-size: 0.9em; border-radius: 4px; font-family: Verdana, sans-serif;">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+    
+    <form action="{% url 'subscribe' %}" method="post" style="margin-top: 1.5em;">
+      {% csrf_token %}
+      <input type="email" name="email" placeholder="your email address" required style="padding: 6px 12px; font-family: Verdana, sans-serif; font-size: 0.9em; background: #333; color: #fff; border: 1px solid #666; max-width: 250px; width: 100%; border-radius: 4px;" />
+      <button type="submit" style="padding: 6px 15px; font-family: Verdana, sans-serif; font-size: 0.9em; background: #eee; color: #222; border: 1px solid #ccc; cursor: pointer; border-radius: 4px; margin-left: 5px;">Subscribe</button>
+    </form>
+  </div>
 {% endblock %}

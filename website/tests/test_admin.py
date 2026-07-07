@@ -6,8 +6,8 @@ from django.utils import timezone
 from django.core.files.uploadedfile import SimpleUploadedFile
 import tempfile
 import shutil
-from website.models import Page, LogEntry, LogAsset, PageAsset
-from website.admin import PageAdmin, LogEntryAdmin, LogAssetInline, PageAssetInline
+from website.models import Page, LogEntry, LogAsset, PageAsset, Subscriber
+from website.admin import PageAdmin, LogEntryAdmin, LogAssetInline, PageAssetInline, SubscriberAdmin
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp()
 
@@ -34,10 +34,12 @@ class AdminTestCase(TestCase):
         self.assertIn(LogEntry, admin.site._registry)
         self.assertIn(PageAsset, admin.site._registry)
         self.assertIn(LogAsset, admin.site._registry)
+        self.assertIn(Subscriber, admin.site._registry)
         
         # Verify classes
         self.assertIsInstance(admin.site._registry[Page], PageAdmin)
         self.assertIsInstance(admin.site._registry[LogEntry], LogEntryAdmin)
+        self.assertIsInstance(admin.site._registry[Subscriber], SubscriberAdmin)
 
     def test_page_admin_config(self):
         page_admin = admin.site._registry[Page]
@@ -49,7 +51,7 @@ class AdminTestCase(TestCase):
         log_admin = admin.site._registry[LogEntry]
         self.assertEqual(
             log_admin.list_display, 
-            ('title', 'publish_date')
+            ('title', 'publish_date', 'send_email_notification', 'email_sent')
         )
         self.assertEqual(log_admin.search_fields, ('title', 'content_markdown'))
         self.assertEqual(log_admin.prepopulated_fields, {'slug': ('title',)})

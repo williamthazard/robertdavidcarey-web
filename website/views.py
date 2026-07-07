@@ -4,7 +4,37 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404, FileResponse
 from django.conf import settings
 from django.core.paginator import Paginator
-from .models import Page, LogEntry
+from django.contrib import messages
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from .models import Page, LogEntry, Subscriber
+
+def subscribe_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        if not email:
+            messages.error(request, "Please enter a valid email address.")
+            return redirect('log_index')
+            
+        try:
+            validate_email(email)
+        except ValidationError:
+            messages.error(request, "Invalid email address format.")
+            return redirect('log_index')
+            
+        subscriber, created = Subscriber.objects.get_or_create(email=email)
+        if created:
+            messages.success(request, "Thank you! You have successfully subscribed to the newsletter.")
+        else:
+            messages.info(request, "You are already subscribed to the newsletter.")
+            
+    return redirect('log_index')
+
+def unsubscribe_view(request, token):
+    subscriber = get_object_or_404(Subscriber, token=token)
+    subscriber.delete()
+    return render(request, 'unsubscribe_success.html')
+
 
 def home_view(request):
     # Serve page with slug 'home' as homepage

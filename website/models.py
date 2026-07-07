@@ -1,7 +1,16 @@
 import os
-import subprocess
+import uuid
 import threading
 from django.db import models
+
+class Subscriber(models.Model):
+    email = models.EmailField(unique=True)
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email
+
 
 class Page(models.Model):
     title = models.CharField(max_length=200)
@@ -65,6 +74,14 @@ class LogEntry(models.Model):
     slug = models.SlugField(unique=True, help_text="E.g., '230919-bear' or '240809'")
     content_markdown = models.TextField(help_text="Raw Markdown content.")
     publish_date = models.DateTimeField(help_text="Publish date of the entry.")
+    send_email_notification = models.BooleanField(
+        default=False,
+        help_text="Send email newsletter to all subscribers on save."
+    )
+    email_sent = models.BooleanField(
+        default=False,
+        help_text="Indicates if email was already sent for this entry."
+    )
 
     class Meta:
         ordering = ['-publish_date']
@@ -72,6 +89,51 @@ class LogEntry(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.send_email_notification and not self.email_sent:
+            import sys
+            if 'test' not in sys.argv:
+                threading.Thread(target=self.send_newsletter_emails).start()
+
+    def send_newsletter_emails(self):
+        from django.core.mail import send_mail
+        from django.template.loader import render_to_string
+        from django.conf import settings
+        
+        subscribers = list(Subscriber.objects.all())
+        if not subscribers:
+            LogEntry.objects.filter(pk=self.pk).update(email_sent=True)
+            return
+
+        subject = f"New log entry: {self.title}"
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'robertdavidcarey@pm.me')
+        
+        for sub in subscribers:
+            unsub_link = f"https://robertdavidcarey.com/unsubscribe/{sub.token}/"
+            
+            context = {
+                'entry': self,
+                'unsubscribe_link': unsub_link,
+            }
+            
+            message_text = render_to_string('emails/newsletter.txt', context)
+            message_html = render_to_string('emails/newsletter.html', context)
+            
+            try:
+                send_mail(
+                    subject=subject,
+                    message=message_text,
+                    from_email=from_email,
+                    recipient_list=[sub.email],
+                    html_message=message_html,
+                    fail_silently=True
+                )
+            except Exception as e:
+                print(f"Error sending newsletter to {sub.email}: {e}")
+                
+        LogEntry.objects.filter(pk=self.pk).update(email_sent=True)
 
 
 class LogAsset(models.Model):

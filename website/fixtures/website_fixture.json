@@ -118,7 +118,9 @@
     "title": "240308",
     "slug": "240308",
     "content_markdown": "\n![SAD](/media/log_assets/SAD.gif)",
-    "publish_date": "2024-03-08T00:00:00Z"
+    "publish_date": "2024-03-08T00:00:00Z",
+    "send_email_notification": false,
+    "email_sent": false
   }
 },
 {

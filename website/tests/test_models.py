@@ -5,7 +5,7 @@ from unittest.mock import patch, MagicMock
 import os
 import tempfile
 import shutil
-from website.models import Page, LogEntry, LogAsset, PageAsset
+from website.models import Page, LogEntry, LogAsset, PageAsset, Subscriber
 
 # Create a temporary directory for media files during tests
 TEMP_MEDIA_ROOT = tempfile.mkdtemp()
@@ -105,3 +105,26 @@ class ModelTestCase(TestCase):
         
         import re
         self.assertTrue(re.match(r"^page_assets/performances-[0-9a-f]{8}\.jpg$", asset.file.name))
+
+    def test_send_newsletter_emails(self):
+        from django.core import mail
+        
+        # Create subscriber
+        sub = Subscriber.objects.create(email="reader@example.com")
+        
+        # Create LogEntry
+        entry = LogEntry.objects.create(
+            title="Newsletter Test",
+            slug="newsletter-test",
+            content_markdown="Post body",
+            publish_date=timezone.now(),
+            send_email_notification=True
+        )
+        
+        # Call directly for a synchronous and reliable unit test
+        entry.send_newsletter_emails()
+        
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, "New log entry: Newsletter Test")
+        self.assertEqual(mail.outbox[0].to, ["reader@example.com"])
+        self.assertIn("Post body", mail.outbox[0].body)

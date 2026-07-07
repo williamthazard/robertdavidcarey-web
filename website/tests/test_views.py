@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.staticfiles import finders
-from website.models import Page, LogEntry
+from website.models import Page, LogEntry, Subscriber
 
 @override_settings(
     STORAGES={
@@ -64,4 +64,26 @@ class ViewsTestCase(TestCase):
         self.assertIn("application/rss+xml", response.headers.get("Content-Type", ""))
         self.assertContains(response, "log / bear")
         self.assertContains(response, "Bear post")
+
+    def test_subscribe_success(self):
+        url = reverse('subscribe')
+        response = self.client.post(url, {'email': 'test@example.com'})
+        # Should redirect back to log index
+        self.assertRedirects(response, reverse('log_index'))
+        self.assertTrue(Subscriber.objects.filter(email='test@example.com').exists())
+
+    def test_subscribe_invalid(self):
+        url = reverse('subscribe')
+        response = self.client.post(url, {'email': 'not-an-email'})
+        self.assertRedirects(response, reverse('log_index'))
+        self.assertFalse(Subscriber.objects.filter(email='not-an-email').exists())
+
+    def test_unsubscribe(self):
+        sub = Subscriber.objects.create(email='test_unsub@example.com')
+        token = sub.token
+        url = reverse('unsubscribe', kwargs={'token': token})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Unsubscribed Successfully")
+        self.assertFalse(Subscriber.objects.filter(email='test_unsub@example.com').exists())
 
