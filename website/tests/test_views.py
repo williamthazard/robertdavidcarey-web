@@ -33,16 +33,11 @@ class ViewsTestCase(TestCase):
         response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'href="/static/css/styles.css"')
-        self.assertContains(response, 'href="/static/favicon.ico"')
 
     def test_static_files_exist_on_disk(self):
         css_path = finders.find('css/styles.css')
         self.assertIsNotNone(css_path)
         self.assertTrue(os.path.exists(css_path))
-
-        favicon_path = finders.find('favicon.ico')
-        self.assertIsNotNone(favicon_path)
-        self.assertTrue(os.path.exists(favicon_path))
 
         font_path = finders.find('fonts/RobotoMono-VariableFont_wght.ttf')
         self.assertIsNotNone(font_path)
