@@ -117,9 +117,7 @@ class Command(BaseCommand):
                     defaults={
                         'title': title,
                         'content_markdown': content,
-                        'publish_date': pub_date,
-                        'posted_to_bluesky': True,
-                        'posted_to_mastodon': True
+                        'publish_date': pub_date
                     }
                 )
 

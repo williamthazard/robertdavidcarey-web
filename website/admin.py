@@ -20,22 +20,10 @@ class LogAssetInline(admin.TabularInline):
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
-    list_display = ('title', 'publish_date', 'posted_to_bluesky', 'posted_to_mastodon')
+    list_display = ('title', 'publish_date')
     search_fields = ('title', 'content_markdown')
     prepopulated_fields = {'slug': ('title',)}
     inlines = [LogAssetInline]
-    
-    # Organise social sharing fields
-    fieldsets = (
-        (None, {
-            'fields': ('title', 'slug', 'content_markdown', 'publish_date')
-        }),
-        ('Social Sharing', {
-            'fields': ('share_to_bluesky', 'share_to_mastodon', 'posted_to_bluesky', 'posted_to_mastodon'),
-            'description': 'Configure automatic publishing to networks on save.'
-        }),
-    )
-    readonly_fields = ('posted_to_bluesky', 'posted_to_mastodon')
 
 @admin.register(Page)
 class PageAdmin(admin.ModelAdmin):

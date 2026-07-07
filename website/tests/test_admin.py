@@ -46,12 +46,11 @@ class AdminTestCase(TestCase):
         log_admin = admin.site._registry[LogEntry]
         self.assertEqual(
             log_admin.list_display, 
-            ('title', 'publish_date', 'posted_to_bluesky', 'posted_to_mastodon')
+            ('title', 'publish_date')
         )
         self.assertEqual(log_admin.search_fields, ('title', 'content_markdown'))
         self.assertEqual(log_admin.prepopulated_fields, {'slug': ('title',)})
         self.assertIn(LogAssetInline, log_admin.inlines)
-        self.assertEqual(log_admin.readonly_fields, ('posted_to_bluesky', 'posted_to_mastodon'))
     @patch('threading.Thread')
     def test_log_asset_inline_config(self, mock_thread):
         inline = LogAssetInline(LogEntry, admin.site)

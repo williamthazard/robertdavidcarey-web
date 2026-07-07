@@ -73,10 +73,6 @@ class MigrationTestCase(TestCase):
                     "A bear is here. ![bear](/media/log_assets/bear.jpeg 'my bear title')\n[audio](/media/log_assets/bear.mp3)"
                 )
                 
-                # Social sharing flags must be marked True to prevent reposts
-                self.assertTrue(entry.posted_to_bluesky)
-                self.assertTrue(entry.posted_to_mastodon)
-                
                 # Verify LogAsset is registered
                 self.assertEqual(entry.assets.count(), 2)
                 

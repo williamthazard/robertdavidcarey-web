@@ -29,8 +29,6 @@ class ModelTestCase(TestCase):
             publish_date=timezone.now()
         )
         self.assertEqual(str(entry), "230919-bear")
-        self.assertFalse(entry.posted_to_bluesky)
-        self.assertFalse(entry.posted_to_mastodon)
 
     @patch('threading.Thread')
     def test_create_log_asset_custom_filename(self, mock_thread):

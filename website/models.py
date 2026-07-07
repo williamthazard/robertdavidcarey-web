@@ -18,12 +18,6 @@ class LogEntry(models.Model):
     slug = models.SlugField(unique=True, help_text="E.g., '230919-bear' or '240809'")
     content_markdown = models.TextField(help_text="Raw Markdown content.")
     publish_date = models.DateTimeField(help_text="Publish date of the entry.")
-    
-    share_to_bluesky = models.BooleanField(default=False, help_text="Post this entry to Bluesky upon saving.")
-    share_to_mastodon = models.BooleanField(default=False, help_text="Post this entry to Mastodon upon saving.")
-    
-    posted_to_bluesky = models.BooleanField(default=False)
-    posted_to_mastodon = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-publish_date']
