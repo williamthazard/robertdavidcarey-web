@@ -5,7 +5,7 @@ Robert David Carey has posted a new entry in his log:
 {{ entry.title }}
 
 ---
-{{ entry.content_markdown }}
+{{ text_content }}
 ---
 
 To read this post on the web, visit: https://robertdavidcarey.com/log/{{ entry.slug }}/

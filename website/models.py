@@ -101,6 +101,8 @@ class LogEntry(models.Model):
         from django.core.mail import send_mail
         from django.template.loader import render_to_string
         from django.conf import settings
+        from website.templatetags.markdown_filters import render_markdown
+        import re
         
         subscribers = list(Subscriber.objects.all())
         if not subscribers:
@@ -109,12 +111,27 @@ class LogEntry(models.Model):
 
         subject = f"New log entry: {self.title}"
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'robertdavidcarey@pm.me')
+        domain = "https://robertdavidcarey.com"
+        
+        # 1. Process HTML Content
+        raw_html = render_markdown(self.content_markdown)
+        absolute_html = raw_html
+        absolute_html = absolute_html.replace('src="/media/', f'src="{domain}/media/')
+        absolute_html = absolute_html.replace('href="/media/', f'href="{domain}/media/')
+        absolute_html = re.sub(r'href="/([^"]*)"', rf'href="{domain}/\1"', absolute_html)
+        
+        # 2. Process Plain Text Content
+        absolute_text = self.content_markdown
+        absolute_text = absolute_text.replace('](/media/', f']({domain}/media/')
+        absolute_text = re.sub(r'\]\(/([^)]*)\)', rf']({domain}/\1)', absolute_text)
         
         for sub in subscribers:
             unsub_link = f"https://robertdavidcarey.com/unsubscribe/{sub.token}/"
             
             context = {
                 'entry': self,
+                'html_content': absolute_html,
+                'text_content': absolute_text,
                 'unsubscribe_link': unsub_link,
             }
             

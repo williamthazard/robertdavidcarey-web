@@ -112,11 +112,11 @@ class ModelTestCase(TestCase):
         # Create subscriber
         sub = Subscriber.objects.create(email="reader@example.com")
         
-        # Create LogEntry
+        # Create LogEntry with relative image and page link references
         entry = LogEntry.objects.create(
             title="Newsletter Test",
             slug="newsletter-test",
-            content_markdown="Post body",
+            content_markdown="Post body. ![bear](/media/log_assets/bear.jpg)\n[writing](/writing/)",
             publish_date=timezone.now(),
             send_email_notification=True
         )
@@ -127,4 +127,14 @@ class ModelTestCase(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "New log entry: Newsletter Test")
         self.assertEqual(mail.outbox[0].to, ["reader@example.com"])
-        self.assertIn("Post body", mail.outbox[0].body)
+        
+        # Verify absolute links in plain text body
+        self.assertIn("https://robertdavidcarey.com/media/log_assets/bear.jpg", mail.outbox[0].body)
+        self.assertIn("https://robertdavidcarey.com/writing/", mail.outbox[0].body)
+        
+        # Verify absolute links in HTML alternative version
+        self.assertEqual(len(mail.outbox[0].alternatives), 1)
+        html_content, content_type = mail.outbox[0].alternatives[0]
+        self.assertEqual(content_type, "text/html")
+        self.assertIn("https://robertdavidcarey.com/media/log_assets/bear.jpg", html_content)
+        self.assertIn("https://robertdavidcarey.com/writing/", html_content)
