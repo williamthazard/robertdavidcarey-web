@@ -58,19 +58,6 @@ class PageAsset(models.Model):
                     os.rename(old_path, new_absolute_path)
                 self.file.name = new_relative_path
                 super().save(update_fields=['file'])
-                
-            # Trigger background processing for image resizing
-            threading.Thread(target=self.compress_asset, args=(new_absolute_path, ext)).start()
-
-    def compress_asset(self, file_path, ext):
-        if ext in ['.jpg', '.jpeg']:
-            try:
-                subprocess.run([
-                    'mogrify', '-resize', '800x450^', '-gravity', 'center',
-                    '-extent', '800x450', '-strip', file_path
-                ], check=True)
-            except Exception as e:
-                print(f"Error compressing JPEG asset: {e}")
 
 
 class LogEntry(models.Model):
@@ -130,86 +117,3 @@ class LogAsset(models.Model):
                     os.rename(old_path, new_absolute_path)
                 self.file.name = new_relative_path
                 super().save(update_fields=['file'])
-                
-            # Trigger background processing
-            threading.Thread(target=self.compress_asset, args=(new_absolute_path, ext)).start()
-
-    def compress_asset(self, file_path, ext):
-        if ext in ['.jpg', '.jpeg']:
-            try:
-                subprocess.run([
-                    'mogrify', '-resize', '800x450^', '-gravity', 'center',
-                    '-extent', '800x450', '-strip', file_path
-                ], check=True)
-            except Exception as e:
-                print(f"Error compressing JPEG asset: {e}")
-                
-        elif ext in ['.mov', '.mp4']:
-            base_path, _ = os.path.splitext(file_path)
-            mp4_path = f"{base_path}.mp4"
-            ogg_path = f"{base_path}.ogg"
-            webm_path = f"{base_path}.webm"
-            poster_path = f"{base_path}.jpeg"
-            
-            # 1. MP4 conversion
-            if file_path.endswith('.mov') or not os.path.exists(mp4_path):
-                try:
-                    try:
-                        subprocess.run([
-                            'ffmpeg', '-y', '-i', file_path, '-preset', 'veryfast',
-                            '-c:v', 'h264_videotoolbox', '-q:v', '50', '-movflags', '+faststart', mp4_path
-                        ], check=True)
-                    except subprocess.CalledProcessError:
-                        subprocess.run([
-                            'ffmpeg', '-y', '-i', file_path, '-preset', 'veryfast',
-                            '-c:v', 'libx264', '-crf', '28', '-movflags', '+faststart', mp4_path
-                        ], check=True)
-                except Exception as e:
-                    print(f"Error converting video to MP4: {e}")
-            
-            # 2. OGG conversion
-            if not os.path.exists(ogg_path):
-                try:
-                    subprocess.run([
-                        'ffmpeg', '-y', '-i', file_path, ogg_path
-                    ], check=True)
-                except Exception as e:
-                    print(f"Error converting video to OGG: {e}")
-                    
-            # 3. WEBM conversion
-            if not os.path.exists(webm_path):
-                try:
-                    subprocess.run([
-                        'ffmpeg', '-y', '-i', file_path, '-q:v', '50', webm_path
-                    ], check=True)
-                except Exception as e:
-                    print(f"Error converting video to WEBM: {e}")
-            
-            # 4. Poster extraction
-            if not os.path.exists(poster_path):
-                try:
-                    src_for_poster = mp4_path if os.path.exists(mp4_path) else file_path
-                    subprocess.run([
-                        'ffmpeg', '-y', '-i', src_for_poster, '-frames:v', '1', '-f', 'image2', poster_path
-                    ], check=True)
-                except Exception as e:
-                    print(f"Error extracting poster frame: {e}")
-                
-            # 5. Large MOV deletion/recompression
-            if ext == '.mov' and os.path.exists(file_path):
-                try:
-                    size_mb = os.path.getsize(file_path) / (1024 * 1024)
-                    if size_mb >= 100:
-                        os.remove(file_path)
-                        try:
-                            subprocess.run([
-                                'ffmpeg', '-y', '-i', mp4_path, '-preset', 'veryfast',
-                                '-c:v', 'h264_videotoolbox', '-q:v', '50', '-movflags', '+faststart', file_path
-                            ], check=True)
-                        except subprocess.CalledProcessError:
-                            subprocess.run([
-                                'ffmpeg', '-y', '-i', mp4_path, '-preset', 'veryfast',
-                                '-c:v', 'libx264', '-crf', '28', '-movflags', '+faststart', file_path
-                            ], check=True)
-                except Exception as e:
-                    print(f"Error compressing original large MOV file: {e}")

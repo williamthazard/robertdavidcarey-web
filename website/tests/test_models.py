@@ -30,8 +30,7 @@ class ModelTestCase(TestCase):
         )
         self.assertEqual(str(entry), "230919-bear")
 
-    @patch('threading.Thread')
-    def test_create_log_asset_custom_filename(self, mock_thread):
+    def test_create_log_asset_custom_filename(self):
         # We need a LogEntry first
         entry = LogEntry.objects.create(
             title="230919-bear", 
@@ -50,11 +49,8 @@ class ModelTestCase(TestCase):
         )
         # Check custom filename logic
         self.assertTrue(asset.file.name.endswith("custom_bear.jpg"))
-        # Check thread was started
-        mock_thread.assert_called_once()
 
-    @patch('threading.Thread')
-    def test_create_log_asset_auto_filename(self, mock_thread):
+    def test_create_log_asset_auto_filename(self):
         entry = LogEntry.objects.create(
             title="230919-bear", 
             slug="230919-bear", 
@@ -78,8 +74,7 @@ class ModelTestCase(TestCase):
         self.assertTrue(re.match(r"^log_assets/230919-bear-[0-9a-f]{8}\.jpg$", asset1.file.name))
         self.assertTrue(re.match(r"^log_assets/230919-bear-[0-9a-f]{8}\.jpg$", asset2.file.name))
 
-    @patch('threading.Thread')
-    def test_create_log_asset_path_traversal(self, mock_thread):
+    def test_create_log_asset_path_traversal(self):
         entry = LogEntry.objects.create(
             title="230919-bear", 
             slug="230919-bear", 
@@ -98,69 +93,7 @@ class ModelTestCase(TestCase):
         self.assertEqual(os.path.basename(asset.file.name), "test_path_traversal.jpg")
         self.assertTrue(asset.file.name.startswith("log_assets/"))
 
-    @patch('subprocess.run')
-    def test_compress_asset_jpeg(self, mock_run):
-        # Create models manually or run compression directly
-        entry = LogEntry.objects.create(
-            title="230919-bear", 
-            slug="230919-bear", 
-            content_markdown="Content", 
-            publish_date=timezone.now()
-        )
-        asset = LogAsset(log_entry=entry)
-        
-        # Call compress_asset directly to avoid threading issues in tests
-        asset.compress_asset("/path/to/test.jpg", ".jpg")
-        
-        mock_run.assert_called_once()
-        args, kwargs = mock_run.call_args
-        cmd = args[0]
-        self.assertIn('mogrify', cmd)
-        self.assertIn('800x450', cmd)
-        self.assertNotIn('16:9', cmd)
-        self.assertIn('/path/to/test.jpg', cmd)
-
-    @patch('subprocess.run')
-    def test_compress_asset_png_bypasses(self, mock_run):
-        entry = LogEntry.objects.create(
-            title="230919-bear", 
-            slug="230919-bear", 
-            content_markdown="Content", 
-            publish_date=timezone.now()
-        )
-        asset = LogAsset(log_entry=entry)
-        asset.compress_asset("/path/to/test.png", ".png")
-        mock_run.assert_not_called()
-
-    @patch('subprocess.run')
-    @patch('os.path.exists')
-    def test_compress_asset_mp4(self, mock_exists, mock_run):
-        # We want to test that ffmpeg is called to create ogg, webm, and poster
-        # Let's say all paths don't exist yet
-        mock_exists.return_value = False
-        
-        entry = LogEntry.objects.create(
-            title="230919-bear", 
-            slug="230919-bear", 
-            content_markdown="Content", 
-            publish_date=timezone.now()
-        )
-        asset = LogAsset(log_entry=entry)
-        
-        asset.compress_asset("/path/to/video.mp4", ".mp4")
-        
-        # subprocess.run should be called for mp4, ogg, webm, and jpeg poster
-        self.assertTrue(mock_run.call_count >= 3)
-        called_cmds = [call_args[0][0] for call_args in mock_run.call_args_list]
-        for cmd in called_cmds:
-            self.assertIn('ffmpeg', cmd)
-            # Find ogg and webm commands and verify they don't contain -preset or -movflags
-            if any(arg.endswith('.ogg') for arg in cmd) or any(arg.endswith('.webm') for arg in cmd):
-                self.assertNotIn('-preset', cmd)
-                self.assertNotIn('-movflags', cmd)
-
-    @patch('threading.Thread')
-    def test_create_page_asset_auto_filename(self, mock_thread):
+    def test_create_page_asset_auto_filename(self):
         page = Page.objects.create(title="Performances", slug="performances", content_markdown="Some text")
         file_content = b"fake image content"
         uploaded_file = SimpleUploadedFile("performance.jpg", file_content, content_type="image/jpeg")
@@ -172,4 +105,3 @@ class ModelTestCase(TestCase):
         
         import re
         self.assertTrue(re.match(r"^page_assets/performances-[0-9a-f]{8}\.jpg$", asset.file.name))
-        mock_thread.assert_called_once()
