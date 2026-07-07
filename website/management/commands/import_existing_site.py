@@ -59,6 +59,19 @@ class Command(BaseCommand):
                         # Rewrite path inside markdown
                         content = content.replace(img, f"/media/page_assets/{dest_img_name}")
 
+            # Normalize links to match Django url patterns
+            content = re.sub(r'href=["\']videos/videos\.html["\']', 'href="/videos/"', content)
+            content = re.sub(r'href=["\']writing/writing\.html["\']', 'href="/writing/"', content)
+            content = re.sub(r'href=["\']performances/performances\.html["\']', 'href="/performances/"', content)
+            content = re.sub(r'href=["\']\.\./index\.html["\']', 'href="/"', content)
+            content = re.sub(r'href=["\']index\.html["\']', 'href="/"', content)
+            
+            # Markdown links:
+            content = re.sub(r'\((?:\.\./)?index\.html\)', '(/)', content)
+            content = re.sub(r'\(videos/videos\.html\)', '(/videos/)', content)
+            content = re.sub(r'\(writing/writing\.html\)', '(/writing/)', content)
+            content = re.sub(r'\(performances/performances\.html\)', '(/performances/)', content)
+
             Page.objects.update_or_create(
                 slug=slug,
                 defaults={
