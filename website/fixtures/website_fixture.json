@@ -1,0 +1,65 @@
+[
+{
+  "model": "website.page",
+  "pk": 1,
+  "fields": {
+    "title": "Robert David Carey",
+    "slug": "home",
+    "content_markdown": "(index.html)\n\n\nThis website under construction.\n<br><br><br><br>\n\n\nThere will be a link to read some writing.\n\nAnother link to watch some [[videos](videos/videos.html)].\n\nAnd yet another listing past and future performances.\n\n\nIf you'd like to contact RDC, please use the email below.",
+    "updated_at": "2026-07-07T16:06:40.993Z"
+  }
+},
+{
+  "model": "website.page",
+  "pk": 2,
+  "fields": {
+    "title": "Writing",
+    "slug": "writing",
+    "content_markdown": "[![](/media/page_assets/writing.PNG)](../index.html)\n\n# writing\n\n[The Living Debt](https://gifrenga.co): an [open-source](https://github.com/williamthazard/gifrenga) GIF renga in collaboration with William Hazard & a cast of thousands. Feel free to add your own lines.\n<br><br><br> \n\nTADALALADALALA\n**April 2024** - \"Circling the Blaze,\" <em> [Ballast Journal](https://www.ballastjournal.com/)</em>\n\n\n**January 2023** - [<em>landescaper</em>](https://www.instagram.com/p/CoiDwaSu19GTsuErfRC5f78YMSAybwly3S3ZSw0/), a self-published chapbook. Still some copies on hand if you would like one - just send an email.\n\n\n**February 2021** - \"The Living Debt,\" original version published by <em>[ctrl+v journal](https://ctrlvjournal.com/issue9/carey.html)</em>\n\n\n**December 2020** - \"Collar\"; \"The Green Flash,\" <em>[Prolit Magazine](https://www.prolitmag.com/issue-four/carey)</em>\n\n\n**September 2019** - \"And our lips parted so the tongue could move,\" <em>[West Branch Wired](https://westbranch.blogs.bucknell.edu/files/2019/09/CAREY.pdf)</em>\n\n\n",
+    "updated_at": "2026-07-07T16:06:40.995Z"
+  }
+},
+{
+  "model": "website.page",
+  "pk": 3,
+  "fields": {
+    "title": "Videos",
+    "slug": "videos",
+    "content_markdown": "[![](code.jpeg)](../index.html)\n\n# videos\n<br>\n\n**a turn** <br>\n\n<em> January 2021, TriQuarterly Magazine </em><br>\nA video-poem on time.<br>\n\n[![](/media/page_assets/aturn.jpeg)](https://www.triquarterly.org/issues/issue-159/turn)\n\n<br><br>\n\n**Only Want To See You**<br>\n\n<em>December 2020, trailer screened at Vox Populi Holiday Minute-Fest</em><br>\nA 2hr2min compilation version of a [YouTube playlist](https://youtube.com/playlist?list=PL7M_1lZMWufLil1p9jGDPWy6wuO3JAN-F&si=eMj9lxp3W_HtZHw0) of white guys singing Purple Rain at karaoke.\n\n[A 2min2sec trailer also exists.](https://youtu.be/p9IQbnYUi20?si=WYInDiWny-87fnCA) <br>\n\n[![](/media/page_assets/ow2cu.jpeg)](https://mega.nz/file/dQwWHRAY#pxLnyeIK3yTj47wxX0SMQybmx82hOj-fwzMna-yx2rY)\n\n<br><br>\n\n**Watching 'La Chambre'**<br>\n\n<em> April 2020, unreleased</em><br>\nA quarantine tribute to Chantal Akerman.\n\nConsolidated and made more efficient in its sequel, [Watching Watching La Chambre While Watching Watching La Chambre](https://youtu.be/Fy9UaUE_4ZU?si=UVC3lcC12OxCtfhm).<br>\n\n[![](/media/page_assets/watchinglachambre.jpeg)](https://youtu.be/GtZmaTbsGO4?si=PmJ5NdNyfKQoI6Ni)\n\n<br><br>\n\n**Awl My Suns** <br>\n\n<em>May 2018, unreleased</em><br>\nA group of actors struggle with unnatural dialogue as a group of filmmakers struggle with the natural world.\n\nThis film began as an experiment in treating the rhyme and rhythm of a found text as a formal constraint for a stream-of-consciousness written piece. Because the source text consisted of a scene from a play, <em>All My Suns</em> by Arthur Miller, the new text was then staged and performed by a group of actors -- who, in turn, were directed to perform according to the intentions of the source text, in a sense pitting them against the new text. Complications arise, and the film becomes something else entirely.<br>\n\n![](/media/page_assets/awlmysuns.jpeg)\n\n<br><br>\n\n**Rain**<br>\n\n<em>October 2017, Bottlecap Press</em><br>\nUsing footage from a classic Gloria Swanson film, this video-poem explores memory, desire, and mortality.<br>\n\n[![](/media/page_assets/rain.jpeg)](https://youtu.be/9jcu9QuMdZo?si=_cp3TeFtj9bK1ULM)\n\n<br><br>\n\n\n**BRIDE OF FRANKENSTEIN**<br>\n\n<em>March 2016, screened at ERCATX 2016, Desert Daze Festival, Chicago Underground Film Festival, and others</em><br>\nDue to an agreement with the performers, this film is not available online. It depicts the comingling of bodies becoming light, and holds a special significance to me. Not recommended for the epileptic.<br>\n\n![](/media/page_assets/boff.jpeg)\n",
+    "updated_at": "2026-07-07T16:06:40.997Z"
+  }
+},
+{
+  "model": "website.page",
+  "pk": 4,
+  "fields": {
+    "title": "Performances",
+    "slug": "performances",
+    "content_markdown": "[![](/media/page_assets/performances.jpg)](../index.html)\n\n# performances\n\n\n**Oct 21 2023** – Theatre of the Flat Imagination, vol. 1: My Walk With Bob (w/ William Hazard), Philadelphia PA\n\n",
+    "updated_at": "2026-07-07T16:06:40.998Z"
+  }
+},
+{
+  "model": "website.logentry",
+  "pk": 1,
+  "fields": {
+    "title": "240308",
+    "slug": "240308",
+    "content_markdown": "\n![SAD](/media/log_assets/SAD.gif)",
+    "publish_date": "2024-03-08T00:00:00Z",
+    "share_to_bluesky": false,
+    "share_to_mastodon": false,
+    "posted_to_bluesky": true,
+    "posted_to_mastodon": true
+  }
+},
+{
+  "model": "website.logasset",
+  "pk": 1,
+  "fields": {
+    "log_entry": 1,
+    "file": "log_assets/SAD.gif",
+    "custom_filename": "SAD.gif"
+  }
+}
+]
