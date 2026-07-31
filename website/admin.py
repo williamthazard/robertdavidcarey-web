@@ -1,6 +1,7 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils.safestring import mark_safe
-from .models import Page, LogEntry, LogAsset, PageAsset, Subscriber
+from .models import Page, LogEntry, LogAsset, PageAsset, Subscriber, Webmention
+from .webmention_sync import sync_webmentions_from_api
 
 class PageAssetInline(admin.TabularInline):
     model = PageAsset
@@ -33,12 +34,18 @@ class LogAssetInline(admin.TabularInline):
         return "Save model to see snippet"
     copyable_snippet.short_description = "Media URL Snippet"
 
+class WebmentionInline(admin.TabularInline):
+    model = Webmention
+    extra = 0
+    fields = ('author_name', 'comment_type', 'content_text', 'source_url', 'is_approved', 'published_at')
+    readonly_fields = ('source_url', 'published_at')
+
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
     list_display = ('title', 'publish_date', 'send_email_notification', 'email_sent')
     search_fields = ('title', 'content_markdown')
     prepopulated_fields = {'slug': ('title',)}
-    inlines = [LogAssetInline]
+    inlines = [LogAssetInline, WebmentionInline]
     
     fieldsets = (
         (None, {
@@ -74,3 +81,23 @@ class SubscriberAdmin(admin.ModelAdmin):
     list_display = ('email', 'subscribed_at')
     search_fields = ('email',)
 
+
+
+@admin.register(Webmention)
+class WebmentionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'comment_type', 'author_name', 'target_url', 'log_entry', 'is_approved', 'published_at', 'received_at')
+    list_filter = ('comment_type', 'is_approved', 'received_at')
+    search_fields = ('author_name', 'source_url', 'target_url', 'content_text')
+    list_editable = ('is_approved',)
+    actions = ['sync_webmentions_action']
+
+    @admin.action(description="Sync latest webmentions from webmention.io")
+    def sync_webmentions_action(self, request, queryset):
+        res = sync_webmentions_from_api()
+        if res['status'] == 'error':
+            self.message_user(request, f"Sync error: {res['message']}", level=messages.ERROR)
+        else:
+            self.message_user(
+                request, 
+                f"Sync complete! Fetched {res['total_fetched']} mentions (Created: {res['created']}, Updated: {res['updated']})."
+            )

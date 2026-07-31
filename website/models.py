@@ -196,3 +196,35 @@ class LogAsset(models.Model):
                     os.rename(old_path, new_absolute_path)
                 self.file.name = new_relative_path
                 super().save(update_fields=['file'])
+
+
+class Webmention(models.Model):
+    log_entry = models.ForeignKey(
+        LogEntry, 
+        on_delete=models.SET_NULL, 
+        related_name='webmentions', 
+        null=True, 
+        blank=True,
+        help_text="Associated log entry post, if matched by target URL."
+    )
+    target_url = models.URLField(max_length=500, help_text="Target URL on this site.")
+    source_url = models.URLField(max_length=500, help_text="Source URL linking to target.")
+    wm_id = models.IntegerField(unique=True, null=True, blank=True, help_text="Webmention.io internal ID.")
+    comment_type = models.CharField(max_length=50, default='reply', help_text="Type: reply, like, repost, mention, comment.")
+    author_name = models.CharField(max_length=200, blank=True, help_text="Author display name.")
+    author_photo = models.URLField(max_length=500, blank=True, help_text="Author avatar image URL.")
+    author_url = models.URLField(max_length=500, blank=True, help_text="Author homepage/profile URL.")
+    content_html = models.TextField(blank=True, help_text="Rendered HTML content of the mention.")
+    content_text = models.TextField(blank=True, help_text="Plain text content of the mention.")
+    published_at = models.DateTimeField(null=True, blank=True, help_text="Publication date of the mention.")
+    received_at = models.DateTimeField(auto_now_add=True, help_text="Timestamp when received by our webhook.")
+    is_approved = models.BooleanField(default=True, help_text="Approval flag for displaying on the site.")
+
+    class Meta:
+        ordering = ['-published_at', '-received_at']
+        verbose_name = "Webmention"
+        verbose_name_plural = "Webmentions"
+
+    def __str__(self):
+        author = self.author_name or self.source_url
+        return f"{self.comment_type} from {author} on {self.target_url}"
